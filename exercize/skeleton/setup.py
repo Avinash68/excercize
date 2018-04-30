@@ -13,5 +13,5 @@ config = {
     'install_requires': ['nose'],
     'packages': ['NAME'],
     'scripts': [],
-    'name': 'Name'}
+    'name': 'NAME'}
 setup(**config)
