@@ -1,0 +1,19 @@
+---
+
+- name: Install MySQL and configure 
+  hosts: servers
+  become: yes
+  roles:
+    - mysql
+
+- name: Djngo Depployment
+  hosts: servers
+  become: yes
+  roles:
+    - django
+
+#- name: React Depployment
+#  hosts: servers
+#  become: yes
+#  roles:
+#    - react

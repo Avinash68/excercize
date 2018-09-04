@@ -1,0 +1,23 @@
+[uwsgi]
+
+chdir = {{ install_root }}/{{ project_name }}
+
+env=DJANGO_SETTINGS_MODULE={{ project_name }}.settings
+
+module = {{project_name}}.wsgi:application
+
+virtualenv= {{ install_root }}
+
+pythonpath = {{ install_root }}/{{ project_name }}
+
+master = true
+
+processes = 10
+
+socket  = {{ ansible_host }}:{{ uwsgi_port }}
+
+chmod-socket = 664
+
+vacuum = true
+
+enable-threda = true

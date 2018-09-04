@@ -1,0 +1,54 @@
+---
+
+project_name: cpd_local
+
+install_root: /usr/local/src/work/cp_Env
+
+
+
+# the correct wsgi_module value would be `hello.wsgi`
+wsgi_module: cpd_local_wsgi
+
+# any directories that need to be added to the PYTHONPATH.
+pythonpath: "{{ install_root }}/{{ project_name }}"
+
+# the git repository URL for the project
+#project_repo: git@github.com:technivore/django-hello-world.git
+#project_repo: https://github.com/django-ve/helloworld.git
+#project_repo: git@gitlab.home:root/demonet.git    
+project_repo: git@192.168.1.223:root-user/CPD-API.git
+# a private key that has access to the repository URL
+ssh_private_key: ~/.ssh/id_rsa
+
+ip: 192.168.1.54
+
+# STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, 'static'))
+static_root: "{{ install_root }}/{{ project_name }}/static"
+
+# the dns name or names (space separated) for your server
+
+
+server_name: "{{ ansible_host }}" 
+
+uwsgi_port: 8004
+
+nginx_port: 8010
+
+
+db_name: auto
+db_user: root
+db_password: mohar@123
+
+# apt packages, you should not need to change this unless you have packages
+# listed in your requirements.txt that depend on system packages.
+system_packages:
+  - git
+  - nginx
+  - gunicorn
+  - postgresql
+  - postgresql-server-dev-all
+  - python-pip
+  - python-dev
+  - python-psycopg2
+  - libmysqlclient-dev
+# vim:ft=ansible:

@@ -1,0 +1,46 @@
+---
+
+    - name: Install system packages
+      apt: pkg={{ item }} update-cache=yes
+      with_items: "{{ system_packages }}"
+
+    - name: install pip
+      sudo: yes
+      easy_install: name=pip
+
+    - name: install virtualenv
+      sudo: yes
+      pip: name={{ item }} state=present extra_args='--upgrade'
+      with_items:
+        - pip
+        - virtualenv
+        
+    - name: create virtualenv with requierd pip installed in it.
+      pip: name=mysql-python virtualenv={{install_root}}   
+
+    - name: Create a new database with name 'Netball'
+      mysql_db:
+        name: netball
+        state: present
+        login_user: root
+        login_password: wAst8Buc
+
+
+    - name:  Copy database over
+      copy: src=files/netball.sql dest=/tmp/netball.sql
+
+    - name:  Import data
+      mysql_db:
+        name: netball
+        state: import
+        target: /tmp/netball.sql
+        login_user: root
+        login_password: wAst8Buc
+
+   
+    - name: remove default nginx site
+      file: path=/etc/nginx/sites-enabled/default state=absent
+
+    - include: deploy.yml
+
+# vim:ft=ansible:

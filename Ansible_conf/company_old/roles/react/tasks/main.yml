@@ -1,0 +1,38 @@
+---
+- name: Install Packages
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+    - build-essential
+    - npm
+    - nodejs-legacy
+- name: Installing Global Packages
+  npm: name={{ item }} global=yes
+  with_items:
+    - babel
+    - babel-cli
+
+- name: Installing General Packages
+  npm: name={{ item }} path={{ react_path }}
+  with_items:
+    - webpack 
+    - webpack-dev-server 
+    - webpack
+    - react
+    - react-dom
+    - babel-core
+    - babel-loader
+    - babel-preset-react
+    - babel-preset-es2015
+
+- name: copy index.html
+  template: src=files/index.j2 dest={{ react_path }}/index.html
+
+- name: copy App.js
+  template: src=files/App.j2 dest={{ react_path }}/App.jsx
+
+- name: copy main.js
+  template: src=files/main.j2 dest={{ react_path }}/main.js
+- name: copy webpack.config.js
+  template: src=files/webpack.config.j2 dest={{ react_path }}/webpack.config.js
+- name: npm Start
+  shell: npm start

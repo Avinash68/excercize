@@ -1,0 +1,47 @@
+upstream {{project_name}} {
+    #server unix:///{{ install_root }}/{{ project_name }}/{{project_name}}.sock;
+
+    server {{ ansible_host }}:{{ uwsgi_port }};
+}
+
+server {
+        listen {{ ansible_host }}:{{ nginx_port }};
+        listen [::]:{{ nginx_port }} default_server ipv6only=on;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        server_name {{ ansible_host }};
+        charset utf-8;
+
+        error_log /var/log/nginx/personalsite.error.log;
+	error_page 404 /custom_404.html;
+
+        client_max_body_size 75M;
+        max_ranges 5;
+        add_header accept_ranges bytes; 
+
+   	location /.(mp4|mp4a)$ {
+   	max_ranges 5;
+   	add_header Accept-Ranges bytes;
+
+   }   
+
+
+
+    location / {
+        uwsgi_pass {{project_name}};
+        include     {{ install_root }}/{{ project_name }}/uwsgi_params;
+    }
+    location /static {
+        alias {{ install_root }}/{{ project_name }}/static;
+        expires 365d;
+    }
+
+    location /media {
+        alias {{ install_root }}/{{ project_name }}/media;
+        expires 365d;
+    }
+    
+
+}

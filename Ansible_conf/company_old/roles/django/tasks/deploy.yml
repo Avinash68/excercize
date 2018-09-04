@@ -1,0 +1,385 @@
+---
+    - name: Clone/pull project repo
+      git: repo={{ project_repo }} dest={{ install_root }}/{{ project_name }}  force=yes
+      notify:
+      - restart gunicorn
+
+    - name: install python packages
+      pip: requirements={{ install_root }}/{{ project_name }}/requirement.txt virtualenv={{install_root}}
+      notify:
+      - restart gunicorn
+
+    - name: install uwsgi
+      pip: name=uwsgi
+
+    - name: Install supervisor
+      apt: name=supervisor state=present force=yes
+      
+    - name: Create UWSGI vassals directory
+      file: path=/etc/uwsgi/vassals  state=directory
+
+    - name: setup uwsgi in supervisor
+      template: src=files/uwsgi_server.j2 dest=/etc/supervisor/conf.d/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+uwsgi-runner.conf
+
+    - name: update supervisor
+      supervisorctl: name=uwsgi-runner state=restarted
+
+    - name: setup project uwsgi configuration file
+      template: src=files/uwsgi.j2 dest={{ install_root }}/{{ project_name }}/{{project_name}}_uwsgi.ini
+
+    - name: create a symlink of uwsgi in vassals
+      file: src={{ install_root }}/{{ project_name }}/{{project_name}}_uwsgi.ini dest=/etc/uwsgi/vassals/{{project_name}}_uwsgi.ini state=link
+
+    - name: touch the symlink file
+      command: touch /etc/uwsgi/vassals/{{project_name}}_uwsgi.ini
+
+
+
+
+    - name: copy nginx config
+      template: src=files/nginx.j2 dest=/etc/nginx/sites-enabled/{{ project_name }}_nginx.conf
+      notify:
+        - restart nginx
+
+   # - name: django migrate
+   #   django_manage: command=migrate app_path={{ install_root }}/{{ project_name }} pythonpath={{ pythonpath }}
+
+  #  - name: django collectstatic
+  #    django_manage: command=collectstatic app_path={{ install_root }}/{{ project_name }} pythonpath={{ pythonpath }}
+
+  #  - name: copy gunicorn config
+  #    template: src=files/gunicorn.j2 dest=/etc/init/gunicorn.conf
+   #   notify:
+    #  - restart gunicorn
+
+    - name: make sure nginx server is running
+      service: name=nginx state=started enabled=yes
+
+    - name: make sure gunicorn server is running
+      service: name=gunicorn state=started enabled=yes
+
+  
+# vim:ft=ansible:
